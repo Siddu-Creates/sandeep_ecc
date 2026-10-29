@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DTGOV Case Study</title>
+<style>
+@font-face{font-family:Luckiest;src:url("assets/fonts/LuckiestGuy-Regular.ttf")}
+@font-face{font-family:Poppins;font-weight:400;src:url("assets/fonts/Poppins-Regular.ttf")}
+@font-face{font-family:Poppins;font-weight:500;src:url("assets/fonts/Poppins-Medium.ttf")}
+@font-face{font-family:Poppins;font-weight:600;src:url("assets/fonts/Poppins-SemiBold.ttf")}
+:root{--white:#f4f4f4;--gold:#ffbb28;--gold-d:#e8a12e;--ink:#050607}
+*{box-sizing:border-box;margin:0}
+html{font-size:clamp(15px,1.05vw,22px);scroll-behavior:smooth}
+body{background:#3f8fe8;font-family:Poppins,sans-serif;color:var(--white);overflow-x:hidden}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;background:linear-gradient(#2f79e8,#8cc4f5)}
+#bar{position:fixed;top:0;left:0;height:6px;width:0;background:var(--gold);z-index:30;box-shadow:0 0 10px var(--gold)}
+.top{position:fixed;top:1rem;left:50%;transform:translateX(-50%);z-index:20;display:flex;gap:.2rem;padding:.35rem;border-radius:99px;background:rgba(5,6,7,.88);backdrop-filter:blur(8px);box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.top a{color:var(--white);text-decoration:none;font-family:Luckiest;font-size:.9rem;letter-spacing:.03em;padding:.5rem 1rem;border-radius:99px;transition:background .25s,color .25s;white-space:nowrap}
+.top a:hover{background:rgba(255,255,255,.15)}.top a.on{background:var(--gold);color:var(--ink)}
+h1,h2,h3{font-family:Luckiest,sans-serif;font-weight:400;letter-spacing:.03em}
+h1,h2{-webkit-text-stroke:6px var(--ink);paint-order:stroke fill;text-shadow:0 4px 0 var(--ink);line-height:1.05}
+h1{font-size:5.4rem;color:var(--white)}h2{font-size:3.6rem}
+.y{color:var(--gold)}
+h3{color:var(--gold);font-size:1.5rem;text-shadow:0 2px 0 var(--ink);margin-bottom:.45em;line-height:1.1}
+.lead{font-weight:500;font-size:1.2rem;max-width:60ch;line-height:1.55}
+/* hero */
+.hero{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1.1rem;padding:5.5rem 5vw 6rem}
+.hero .big{height:30vh;filter:drop-shadow(0 14px 16px rgba(0,30,90,.45));animation:bob 4s ease-in-out infinite}
+.hero .lead{text-shadow:0 2px 8px rgba(0,40,120,.8)}
+.cta{font:600 1.2rem Poppins;color:#fff;border:0;border-bottom:7px solid #c25a00;border-radius:99px;padding:.8rem 2.6rem;background:linear-gradient(#ffb02e,#ff7a00);cursor:pointer;text-decoration:none;box-shadow:0 10px 20px rgba(0,40,120,.35);transition:transform .2s}
+.cta:hover{transform:translateY(-4px) scale(1.04)}.cta:active{transform:translateY(2px)}
+.hud{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-top:1rem}
+.chip{min-width:11rem;padding:.8rem 1.1rem;border-radius:18px;background:rgba(8,45,130,.72);border:2px solid rgba(255,255,255,.6);backdrop-filter:blur(8px);text-align:left}
+.chip b{font-family:Luckiest;font-weight:400;font-size:2rem;color:var(--gold);text-shadow:0 2px 0 var(--ink);margin-right:.3rem}
+.chip span{font-weight:500;font-size:.95rem}
+.chip i{display:block;height:.45rem;border-radius:9px;margin-top:.5rem;background:rgba(255,255,255,.25);overflow:hidden}
+.chip i::after{content:"";display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,#b13cf0,#ffbb28);transition:width 1.6s .3s}
+.chip.in i::after{width:100%}
+/* sections */
+.sec{position:relative;z-index:2;margin-top:-3rem;padding:8rem 5vw 7rem;border-radius:3rem 3rem 0 0;min-height:100vh;display:flex;align-items:center}
+.light{background:var(--white);color:var(--ink);--cbg:linear-gradient(#2f7be6,#1f62cc);--cfg:#fff;--cbd:#0d3a85;--arr:var(--ink)}
+.warm{background:linear-gradient(#ffd9cf,#fff0c8 45%,#cfe4ff);color:var(--ink);--cbg:linear-gradient(#2f7be6,#1f62cc);--cfg:#fff;--cbd:#0d3a85;--arr:var(--ink)}
+.dark{background:var(--ink);color:var(--white);--cbg:#111c33;--cfg:var(--white);--cbd:var(--gold);--arr:var(--gold)}
+.light h2,.warm h2{color:var(--gold)}.dark h2{color:var(--white)}
+.end{background:none;border-radius:0;margin-top:0;min-height:90vh;justify-content:center;text-align:center;color:var(--white)}
+.wrap{width:100%;max-width:1300px;margin:auto}
+.split{display:grid;grid-template-columns:minmax(0,1fr) 24%;gap:3.5rem;align-items:center}
+.split.flip{grid-template-columns:24% minmax(0,1fr)}.flip .par{order:-1}
+.body{display:flex;flex-direction:column;gap:1.5rem;min-width:0}
+.tag{align-self:flex-start;font-family:Luckiest;font-size:1.1rem;letter-spacing:.04em;background:var(--gold);color:var(--ink);border:3px solid var(--ink);border-bottom-width:5px;border-radius:99px;padding:.1em .9em}
+.par{transform:translateY(var(--py,0px));will-change:transform}
+.char{width:100%;max-height:60vh;object-fit:contain;filter:drop-shadow(0 14px 14px rgba(0,30,90,.4));animation:bob 4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-12px)}}
+.grid{display:grid;gap:1.2rem}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--cbg);color:var(--cfg);border:3px solid var(--cbd);border-bottom-width:7px;border-radius:22px;padding:1.3rem 1.5rem;font-size:1.02rem;line-height:1.5;box-shadow:0 10px 22px rgba(0,30,90,.18);transition:transform .25s,box-shadow .25s}
+.card:hover{transform:translateY(-6px);box-shadow:0 16px 28px rgba(0,30,90,.28)}
+.card ul{list-style:none;padding:0}
+.card li{padding-left:1.3em;position:relative;margin-bottom:.45em}
+.card li::before{content:"";position:absolute;left:0;top:.55em;width:.6em;height:.6em;border-radius:50%;background:var(--gold)}
+.strip{align-self:flex-start;background:var(--gold);color:var(--ink);border:3px solid var(--ink);border-bottom-width:6px;border-radius:16px;padding:.7rem 1.3rem;font-weight:600}
+.tabs{display:flex;gap:.7rem;flex-wrap:wrap}
+.tabs button{font:600 1rem Poppins;color:var(--white);background:transparent;border:2px solid var(--white);border-radius:99px;padding:.55rem 1.3rem;cursor:pointer;transition:all .2s}
+.tabs button:hover{border-color:var(--gold);color:var(--gold)}
+.tabs button.on{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.pane{display:none}.pane.on{display:block;animation:pop .45s}
+.pane .card{font-size:1.2rem;min-height:15rem}
+@keyframes pop{from{opacity:0;transform:translateY(24px) scale(.97)}}
+.flow{display:flex;align-items:stretch;gap:.5rem}
+.step{flex:1;min-width:0;text-align:center;padding:1rem .8rem;font-size:.92rem;transition:transform .3s,background .3s,color .3s,border-color .3s}
+.step b{display:block;font-family:Luckiest;font-weight:400;color:var(--gold);font-size:1.2rem;margin-bottom:.3em;line-height:1.1;text-shadow:0 2px 0 var(--ink)}
+.step.lit{background:var(--gold);color:var(--ink);border-color:var(--ink);transform:translateY(-10px) scale(1.04)}
+.step.lit b{color:var(--ink);text-shadow:none}
+.arr{flex:none;width:1.6rem;align-self:center;fill:none;stroke:var(--arr);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.row{display:flex;gap:2vw;align-items:flex-end;justify-content:center;margin-bottom:1.5rem}
+.row img{height:24vh;filter:drop-shadow(0 12px 14px rgba(0,30,90,.4));animation:bob 4s ease-in-out infinite}
+.row img:nth-child(2){animation-delay:-1s}.row img:nth-child(3){animation-delay:-2s}.row img:nth-child(4){animation-delay:-3s}
+.end .lead{margin:1rem auto 0;text-shadow:0 2px 8px rgba(0,40,120,.8)}
+/* reveal */
+.rv{opacity:0}.rv.in{opacity:1;animation:rise .8s var(--d,0s) backwards cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(46px) scale(.96)}}
+@media(max-width:860px){.split,.split.flip{grid-template-columns:1fr;gap:1.5rem}.flip .par{order:0}.par{width:55%;margin:auto}.g2,.g3{grid-template-columns:1fr}.flow{flex-direction:column}.arr{transform:rotate(90deg);align-self:center}.top{max-width:94vw;overflow-x:auto}h1{font-size:2.8rem}h2{font-size:2.3rem}.sec{padding-top:6rem}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}.rv{opacity:1}}
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas><div id="bar"></div>
+<svg width="0" height="0" style="position:absolute"><symbol id="ch" viewBox="0 0 24 24"><path d="M8 4l8 8-8 8"/></symbol></svg>
+<nav class="top menu"><a href="#hero">Home</a><a href="#s1">Case 1</a><a href="#s2">Case 2</a><a href="#s3">Case 3</a><a href="#s4">Case 4</a></nav>
+
+<main>
+<header class="hero" id="hero">
+  <img class="big" src="assets/images/main.png" alt="" onerror="this.remove()">
+  <h1>DTGOV <span class="y">Case</span> Study</h1>
+  <p class="lead">How DTGOV's cloud grew: remote administration, resource management, SLA management and billing.</p>
+  <a class="cta" href="#s1">Start Now</a>
+  <div class="hud">
+    <div class="chip"><b data-count="4">0</b><span>case studies</span><i></i></div>
+    <div class="chip"><b data-count="11">0</b><span>VIM features</span><i></i></div>
+    <div class="chip"><b data-count="3">0</b><span>SLA reports</span><i></i></div>
+    <div class="chip"><b data-count="2">0</b><span>billing repositories</span><i></i></div>
+  </div>
+</header>
+
+<section class="sec light" id="s1"><div class="wrap split">
+  <div class="body">
+    <span class="tag">Case Study 1</span><h2>Remote Administration</h2>
+    <p class="lead">DTGOV's remote administration system needs an upgrade for a growing number of cloud consumers and a wider variety of requests.</p>
+    <div class="grid g3">
+      <div class="card"><h3>Self-provisioning</h3><ul><li>Consumers provision virtual servers and virtual storage devices themselves</li><li>Interoperates with the VIM platform's proprietary API</li></ul></div>
+      <div class="card"><h3>Single sign-on</h3><ul><li>One mechanism to centrally authorize cloud consumers</li><li>Central control of consumer access</li></ul></div>
+      <div class="card"><h3>Exposed API</h3><ul><li>Provision, start, stop and release</li><li>Scale up and down</li><li>Replicate virtual servers and storage</li></ul></div>
+    </div>
+    <div class="strip">Result: a new self-service portal and an extended usage and administration portal</div>
+  </div>
+  <div class="par" data-p=".14"><img class="char" src="assets/images/king.png" alt="" onerror="this.remove()"></div>
+</div></section>
+
+<section class="sec dark" id="s2"><div class="wrap split flip">
+  <div class="par" data-p=".14"><img class="char" src="assets/images/queen.png" alt="" onerror="this.remove()"></div>
+  <div class="body">
+    <span class="tag">Case Study 2</span><h2>Resource Management</h2>
+    <p class="lead">An extension of the new VIM product DTGOV purchased. Pick a topic:</p>
+    <div class="tabs"><button class="on" data-t="p1">Resources</button><button data-t="p2">Images and scaling</button><button data-t="p3">APIs</button><button data-t="p4">Integration</button></div>
+    <div class="pane on" id="p1"><div class="card"><h3>Resources</h3><ul><li>Flexible allocation of pooled IT resources across different data centers</li><li>Management of cloud consumer databases</li><li>Isolation of virtual IT resources at logical perimeter networks</li></ul></div></div>
+    <div class="pane" id="p2"><div class="card"><h3>Images and scaling</h3><ul><li>Template virtual server image inventory, ready for immediate instantiation</li><li>Automated replication ("snapshotting") of images for virtual server creation</li><li>Automated up-down scaling by usage thresholds, enabling live VM migration among physical servers</li></ul></div></div>
+    <div class="pane" id="p3"><div class="card"><h3>APIs</h3><ul><li>Create and manage virtual servers and virtual storage devices</li><li>Create network access control rules</li><li>Up-down scale virtual IT resources</li><li>Migrate and replicate resources across multiple data centers</li></ul></div></div>
+    <div class="pane" id="p4"><div class="card"><h3>Integration</h3><ul><li>Single sign-on through an LDAP interface</li><li>Custom SNMP command scripts work with network management tools to establish isolated virtual networks across multiple data centers</li></ul></div></div>
+  </div>
+</div></section>
+
+<section class="sec warm" id="s3"><div class="wrap">
+  <div class="body">
+    <span class="tag">Case Study 3</span><h2>SLA Management</h2>
+    <p class="lead">The SLA management system works with the existing VIM, so administrators can monitor the availability of hosted IT resources through SLA monitors. Predefined reports appear on custom dashboards.</p>
+    <div class="grid g3">
+      <div class="card"><h3>Per-Data Center Availability</h3>Public on DTGOV's corporate cloud portal. Shows the real-time operational condition of each group of IT resources at each data center.</div>
+      <div class="card"><h3>Per-Consumer Availability</h3>Real-time condition of individual IT resources. Only the cloud provider and the consumer who leases or owns them can see it.</div>
+      <div class="card"><h3>Per-Consumer SLA Report</h3>Summarizes SLA statistics for a consumer's IT resources, including downtimes and other timestamped SLA events.</div>
+    </div>
+    <h2 style="font-size:2.6rem;margin-top:1.5rem">How SLA events <span class="y" style="color:#1f62cc">travel</span></h2>
+    <div class="flow">
+      <div class="card step"><b>SLA monitors</b>Generate events about physical and virtual IT resources</div><svg class="arr"><use href="#ch"/></svg>
+      <div class="card step"><b>SNMP agent</b>Custom agent receives the notifications</div><svg class="arr"><use href="#ch"/></svg>
+      <div class="card step"><b>VIM API</b>Links each event to the affected virtual resource</div><svg class="arr"><use href="#ch"/></svg>
+      <div class="card step"><b>Event database</b>Stores server and network downtimes</div><svg class="arr"><use href="#ch"/></svg>
+      <div class="card step"><b>REST API</b>Connects to central remote administration</div>
+    </div>
+    <div class="strip">A batch service sends downtime data to billing, which becomes credit on usage fees</div>
+  </div>
+</div></section>
+
+<section class="sec dark" id="s4"><div class="wrap split">
+  <div class="body">
+    <span class="tag">Case Study 4</span><h2>Billing Management</h2>
+    <p class="lead">DTGOV creates invoices for custom-defined billable events such as subscriptions and IT resource volume usage.</p>
+    <div class="grid g2">
+      <div class="card"><h3>Two proprietary databases</h3><ul><li>Billable event repository</li><li>Pricing scheme repository</li></ul></div>
+      <div class="card"><h3>Pricing</h3>A standard pricing model applies to most consumer contracts. It can be customized when special terms are negotiated.</div>
+    </div>
+    <div class="flow">
+      <div class="card step"><b>Pay-per-use monitors</b>Extensions to the VIM platform</div><svg class="arr"><use href="#ch"/></svg>
+      <div class="card step"><b>Usage events</b>Start, stop, scaling and decommissioning, stored by the VIM</div><svg class="arr"><use href="#ch"/></svg>
+      <div class="card step"><b>Billable events</b>Supplied regularly to the billing system</div><svg class="arr"><use href="#ch"/></svg>
+      <div class="card step"><b>Invoices</b>Priced with the pricing scheme</div>
+    </div>
+  </div>
+  <div class="par" data-p=".14"><img class="char" src="assets/images/wizard.webp" alt="" onerror="this.remove()"></div>
+</div></section>
+
+<section class="sec end" id="end"><div class="wrap">
+  <div class="row"><img src="assets/images/king.png" alt="" onerror="this.remove()"><img src="assets/images/queen.png" alt="" onerror="this.remove()"><img src="assets/images/wizard.webp" alt="" onerror="this.remove()"><img src="assets/images/dino.png" alt="" onerror="this.remove()"></div>
+  <h1>Thank <span class="y">You</span></h1>
+  <p class="lead">Any questions?</p>
+</div></section>
+</main>
+
+<script>
+const $=(s,r=document)=>[...r.querySelectorAll(s)];
+/* reveal on scroll, with stagger */
+$('.hero>*,.body>*,.grid>*,.flow>.step,.hud>*,.end .wrap>*').forEach(e=>e.classList.add('rv'));
+$('.grid,.flow,.hud,.body,.hero').forEach(g=>[...g.children].forEach((c,i)=>c.style.setProperty('--d',i*.1+'s')));
+function countUp(el){const n=+el.dataset.count,t0=performance.now();
+  (function f(t){const k=Math.min((t-t0)/1200,1);el.textContent=Math.round(n*k);if(k<1)requestAnimationFrame(f)})(t0)}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;
+  e.target.classList.add('in');$('[data-count]',e.target).forEach(countUp);io.unobserve(e.target)}),{threshold:.15});
+$('.rv').forEach(e=>io.observe(e));
+/* flow diagrams light up step by step while on screen */
+const vis=new IntersectionObserver(es=>es.forEach(e=>e.target.dataset.vis=e.isIntersecting?1:''),{threshold:.4});
+$('.flow').forEach(f=>vis.observe(f));
+let k=0;setInterval(()=>{k++;$('.flow').forEach(f=>{if(!f.dataset.vis)return;const s=$('.step',f);s.forEach((x,i)=>x.classList.toggle('lit',i===k%(s.length+1)))})},1200);
+/* tabs */
+$('.tabs button').forEach(b=>b.onclick=()=>{const s=b.closest('.sec');
+  $('.tabs button',s).forEach(x=>x.classList.toggle('on',x===b));$('.pane',s).forEach(x=>x.classList.toggle('on',x.id===b.dataset.t))});
+/* progress bar, parallax, active menu */
+const secs=$('main>*[id]'),links=$('.menu a'),bar=$('#bar')[0],par=$('.par');
+function tick(){
+  bar.style.width=scrollY/(document.documentElement.scrollHeight-innerHeight)*100+'%';
+  par.forEach(p=>{const r=p.getBoundingClientRect();p.style.setProperty('--py',(r.top+r.height/2-innerHeight/2)*-(+p.dataset.p)+'px')});
+  let c=0;secs.forEach((s,i)=>{if(s.getBoundingClientRect().top<innerHeight*.4)c=i});
+  links.forEach(a=>a.classList.toggle('on',a.hash==='#'+secs[c].id));
+}
+addEventListener('scroll',()=>requestAnimationFrame(tick),{passive:true});addEventListener('resize',tick);tick();
+/* presenter keys: jump section by section */
+addEventListener('keydown',e=>{
+  const nx=['ArrowRight','PageDown'].includes(e.key),pv=['ArrowLeft','PageUp'].includes(e.key);
+  if(!nx&&!pv)return;e.preventDefault();
+  let c=0;secs.forEach((s,i)=>{if(s.getBoundingClientRect().top<innerHeight*.4)c=i});
+  secs[Math.min(Math.max(c+(nx?1:-1),0),secs.length-1)].scrollIntoView({behavior:'smooth'});
+});
+
+/* ---------- Cloud background (WebGL, ported from the React CloudShader) ---------- */
+const VERT=`attribute vec2 a_pos;varying vec2 v_uv;void main(){v_uv=a_pos*0.5+0.5;gl_Position=vec4(a_pos,0.0,1.0);}`;
+const FRAG=`
+precision highp float;
+varying vec2 v_uv;
+uniform vec2 u_res;uniform float u_time;uniform float u_count;
+uniform vec3 u_cloud;uniform vec3 u_skyTop;uniform vec3 u_skyBottom;
+const mat2 R=mat2(0.80,0.60,-0.60,0.80);
+float hash(vec2 p){return fract(sin(dot(p,vec2(41.31,289.17)))*26737.367);}
+float vnoise(vec2 p){vec2 i=floor(p);vec2 f=fract(p);f=f*f*(3.0-2.0*f);
+ float a=hash(i);float b=hash(i+vec2(1.0,0.0));float c=hash(i+vec2(0.0,1.0));float d=hash(i+vec2(1.0,1.0));
+ return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);}
+float fbm(vec2 p){float s=0.0;float a=0.5;for(int i=0;i<4;i++){s+=a*vnoise(p);p=R*p*2.03+19.19;a*=0.5;}return s;}
+float billow(vec2 p){float s=0.0;float a=0.5;for(int i=0;i<5;i++){s+=a*(1.0-abs(2.0*vnoise(p)-1.0));p=R*p*2.11+13.37;a*=0.5;}return s;}
+float cloudDensity(vec2 p,vec2 c,vec2 r,float seed,float t){
+ vec2 q=p-c;float ry=q.y>0.0?r.y:r.y*0.42;
+ float env=1.0-length(vec2(q.x/r.x,q.y/ry));
+ if(env<-0.35)return 0.0;
+ vec2 dp=q*(2.4/r.x)+seed;
+ dp+=0.6*vec2(fbm(dp*1.4+t*0.04),fbm(dp*1.4+7.7-t*0.03));
+ float detail=billow(dp*1.6);
+ return env+(detail-0.62)*0.62;}
+vec3 shadeCloud(vec3 color,vec3 sky,vec2 p,vec2 c,vec2 r,float seed,float t,float dist){
+ float d=cloudDensity(p,c,r,seed,t);
+ if(d<0.02)return color;
+ float dUp=cloudDensity(p+vec2(0.0,r.y*0.55),c,r,seed,t);
+ float occl=clamp((dUp-d)*1.1+d*0.55,0.0,1.0);
+ vec3 lit=u_cloud*1.04;vec3 shadow=mix(u_cloud*0.60,sky,0.38);
+ vec3 cloudCol=mix(lit,shadow,occl*0.85);
+ float alpha=smoothstep(0.02,0.38,d);
+ float rim=smoothstep(0.02,0.14,d)*(1.0-smoothstep(0.14,0.40,d));
+ cloudCol+=rim*0.10;
+ cloudCol=mix(cloudCol,sky,dist*0.35);
+ alpha*=mix(1.0,0.8,dist);
+ return mix(color,cloudCol,alpha);}
+vec3 cloudPass(vec3 color,vec3 sky,vec2 p,float aspect,float t,float spd,float phase,float y,vec2 r,float seed,float dist){
+ float cx=mix(-r.x-0.25,aspect+r.x+0.25,fract(t*spd+phase));
+ float cy=y+sin(t*0.05+phase*6.2831)*0.012;
+ return shadeCloud(color,sky,p,vec2(cx,cy),r,seed,t,dist);}
+void main(){
+ float aspect=u_res.x/u_res.y;vec2 p=vec2(v_uv.x*aspect,v_uv.y);float t=u_time;
+ vec3 sky=mix(u_skyBottom,u_skyTop,v_uv.y);vec3 color=sky;
+ color=mix(color,u_skyBottom*1.06,smoothstep(0.35,0.0,v_uv.y)*0.5);
+ vec2 sunPos=vec2(aspect*0.78,0.92);float sd=length(p-sunPos);
+ color+=vec3(1.0,0.95,0.82)*exp(-sd*sd*5.0)*0.28;
+ float band=smoothstep(0.55,0.8,v_uv.y)*(1.0-smoothstep(0.9,1.0,v_uv.y));
+ if(band>0.01){float streak=fbm(vec2(p.x*1.6-t*0.006,p.y*12.0));
+  float wisp=smoothstep(0.52,0.78,streak)*band;color=mix(color,u_cloud*0.98,wisp*0.35);}
+ if(u_count>5.5)color=cloudPass(color,sky,p,aspect,t,0.006,0.10,0.84,vec2(0.20,0.10),43.7,1.0);
+ if(u_count>4.5)color=cloudPass(color,sky,p,aspect,t,0.008,0.62,0.73,vec2(0.24,0.12),71.3,0.85);
+ if(u_count>3.5)color=cloudPass(color,sky,p,aspect,t,0.011,0.33,0.60,vec2(0.34,0.16),17.3,0.55);
+ if(u_count>2.5)color=cloudPass(color,sky,p,aspect,t,0.013,0.80,0.47,vec2(0.30,0.15),29.9,0.45);
+ if(u_count>1.5)color=cloudPass(color,sky,p,aspect,t,0.016,0.05,0.35,vec2(0.46,0.20),91.1,0.15);
+ color=cloudPass(color,sky,p,aspect,t,0.020,0.48,0.20,vec2(0.56,0.24),57.2,0.0);
+ gl_FragColor=vec4(color,1.0);}`;
+
+function parseHex(v){v=v.trim().replace('#','');if(v.length===3)v=[...v].map(c=>c+c).join('');
+  return [0,2,4].map(i=>parseInt(v.slice(i,i+2),16)/255);}
+function compile(gl,type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);
+  if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){console.warn(gl.getShaderInfoLog(s));return null}return s;}
+
+function CloudShader(canvas,o={}){
+  const opt={speed:1,count:6,cloudColor:'#fbf8f2',skyTopColor:'#2f79e8',skyBottomColor:'#8cc4f5',...o};
+  const gl=canvas.getContext('webgl',{alpha:false,antialias:false});
+  if(!gl)return;
+  const vs=compile(gl,gl.VERTEX_SHADER,VERT),fs=compile(gl,gl.FRAGMENT_SHADER,FRAG);
+  if(!vs||!fs)return;
+  const prog=gl.createProgram();
+  gl.attachShader(prog,vs);gl.attachShader(prog,fs);gl.bindAttribLocation(prog,0,'a_pos');gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog,gl.LINK_STATUS))return;
+  gl.useProgram(prog);
+  gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+  const u=n=>gl.getUniformLocation(prog,n);
+  const L={res:u('u_res'),time:u('u_time'),count:u('u_count'),cloud:u('u_cloud'),top:u('u_skyTop'),bot:u('u_skyBottom')};
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function resize(){
+    const dpr=Math.min(devicePixelRatio||1,2);
+    const w=Math.max(1,Math.floor(canvas.clientWidth*dpr)),h=Math.max(1,Math.floor(canvas.clientHeight*dpr));
+    if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h}
+    gl.viewport(0,0,w,h);gl.uniform2f(L.res,w,h);
+  }
+  new ResizeObserver(resize).observe(canvas);resize();
+  const c=parseHex(opt.cloudColor),t=parseHex(opt.skyTopColor),b=parseHex(opt.skyBottomColor);
+  gl.uniform3f(L.cloud,...c);gl.uniform3f(L.top,...t);gl.uniform3f(L.bot,...b);
+  gl.uniform1f(L.count,Math.min(6,Math.max(1,opt.count)));
+  const start=performance.now();
+  (function draw(now){
+    gl.uniform1f(L.time,reduce?0:((now-start)/1000)*opt.speed);
+    gl.drawArrays(gl.TRIANGLES,0,3);
+    requestAnimationFrame(draw);
+  })(start);
+}
+CloudShader(document.getElementById('sky'),{speed:1.5,count:5});
+</script>
+</body>
+</html>
